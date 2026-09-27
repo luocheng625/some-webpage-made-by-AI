@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>回声 · 那个孩子，还在</title>
+<meta name="description" content="关于童年创伤，以及它如何悄悄住进我们成年后的每一次交流。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" media="print" onload="this.media='all'"
+      href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap">
+<style>
+:root{
+  --ink:#0d0c0b;
+  --ink-2:#151311;
+  --paper:#ece6da;
+  --paper-dim:rgba(236,230,218,.64);
+  --paper-faint:rgba(236,230,218,.3);
+  --line:rgba(236,230,218,.1);
+  --amber:#d8a569;
+  --amber-soft:rgba(216,165,105,.16);
+  --serif:"Noto Serif SC","Source Han Serif SC","Songti SC","STSong","SimSun",serif;
+  --latin:"Cormorant Garamond","Times New Roman",serif;
+  --sans:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",system-ui,sans-serif;
+  --ease:cubic-bezier(.2,.7,.2,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--ink);color:var(--paper);
+  font-family:var(--serif);font-weight:300;line-height:1.9;letter-spacing:.04em;
+  overflow-x:hidden;-webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--amber);color:var(--ink)}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+em{font-style:normal;color:var(--amber)}
+
+/* ---------- 氛围层 ---------- */
+#sky{position:fixed;inset:0;z-index:0;pointer-events:none}
+.grain{
+  position:fixed;inset:-50%;z-index:90;pointer-events:none;opacity:.055;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation:grain 1.2s steps(5) infinite;
+}
+@keyframes grain{
+  0%{transform:translate(0,0)}20%{transform:translate(-3%,2%)}40%{transform:translate(2%,-3%)}
+  60%{transform:translate(-2%,-1%)}80%{transform:translate(3%,3%)}100%{transform:translate(0,0)}
+}
+.vignette{position:fixed;inset:0;z-index:2;pointer-events:none;
+  background:radial-gradient(ellipse at center,transparent 45%,rgba(0,0,0,.55) 100%)}
+.glow{
+  position:fixed;left:0;top:0;width:560px;height:560px;margin:-280px 0 0 -280px;z-index:1;
+  pointer-events:none;border-radius:50%;
+  background:radial-gradient(circle,rgba(216,165,105,.09),transparent 62%);
+  will-change:transform;
+}
+.progress{position:fixed;left:0;top:0;height:1px;width:100%;z-index:60;
+  background:var(--amber);transform-origin:0 50%;transform:scaleX(0);opacity:.7}
+
+/* ---------- 导航 ---------- */
+.top{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;justify-content:space-between;
+  align-items:center;padding:28px 4vw;mix-blend-mode:difference;pointer-events:none}
+.brand{font-family:var(--latin);font-size:15px;letter-spacing:.35em;text-transform:uppercase;pointer-events:auto}
+.brand b{font-family:var(--serif);font-weight:400;letter-spacing:.2em;margin-right:.8em}
+.top .note{font-family:var(--sans);font-size:11px;letter-spacing:.2em;opacity:.5}
+.dots{position:fixed;right:3vw;top:50%;transform:translateY(-50%);z-index:50;display:flex;flex-direction:column;gap:18px}
+.dots a{position:relative;display:block;width:6px;height:6px;border-radius:50%;background:var(--paper-faint);transition:.5s var(--ease)}
+.dots a.on{background:var(--amber);transform:scale(1.6)}
+.dots a span{position:absolute;right:20px;top:50%;transform:translate(8px,-50%);white-space:nowrap;
+  font-family:var(--sans);font-size:11px;letter-spacing:.2em;color:var(--paper-dim);opacity:0;transition:.4s var(--ease);pointer-events:none}
+.dots a:hover span{opacity:1;transform:translate(0,-50%)}
+
+/* ---------- 通用 ---------- */
+section{position:relative;z-index:3;padding:20vh 8vw}
+.wrap{max-width:1080px;margin:0 auto}
+.kicker{font-family:var(--latin);font-size:14px;letter-spacing:.42em;text-transform:uppercase;color:var(--amber);display:flex;align-items:center;gap:18px;margin-bottom:36px}
+.kicker::after{content:"";width:60px;height:1px;background:currentColor;opacity:.5}
+h2{font-weight:300;font-size:clamp(28px,4vw,48px);line-height:1.45;letter-spacing:.08em;margin-bottom:28px}
+.lead{color:var(--paper-dim);max-width:560px;font-size:16px}
+.hint{font-family:var(--sans);font-size:12px;letter-spacing:.25em;color:var(--paper-faint)}
+
+.rv{opacity:0;transform:translateY(28px);filter:blur(8px);
+  transition:opacity 1.6s var(--ease),transform 1.6s var(--ease),filter 1.6s var(--ease);transition-delay:var(--d,0s)}
+.rv.in{opacity:1;transform:none;filter:none}
+
+/* ---------- Hero ---------- */
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding-top:0;padding-bottom:0}
+.hero .eyebrow{font-family:var(--latin);font-style:italic;font-size:18px;letter-spacing:.2em;color:var(--paper-faint);margin-bottom:40px}
+.hero h1{font-weight:300;font-size:clamp(38px,7vw,96px);line-height:1.35;letter-spacing:.1em}
+.hero h1 .l{display:block}
+.hero h1 .l:nth-child(2){padding-left:1.2em}
+.char{display:inline-block;opacity:0;filter:blur(12px);transform:translateY(.25em);
+  animation:charIn 2s var(--ease) forwards;animation-delay:calc(var(--i) * 90ms + .5s)}
+@keyframes charIn{to{opacity:1;filter:none;transform:none}}
+.hero .sub{margin-top:56px;max-width:440px;color:var(--paper-dim);font-size:15px;opacity:0;animation:fade 2s 2.8s forwards}
+.hero .cw{margin-top:18px;font-family:var(--sans);font-size:12px;letter-spacing:.12em;color:var(--paper-faint);opacity:0;animation:fade 2s 3.2s forwards}
+@keyframes fade{to{opacity:1}}
+.scroll{position:absolute;left:50%;bottom:6vh;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:14px;opacity:0;animation:fade 2s 3.6s forwards}
+.scroll i{display:block;width:1px;height:64px;background:linear-gradient(var(--paper-faint),transparent);position:relative;overflow:hidden}
+.scroll i::after{content:"";position:absolute;left:0;top:-40%;width:1px;height:40%;background:var(--amber);animation:drip 2.4s var(--ease) infinite}
+@keyframes drip{to{top:110%}}
+
+/* ---------- 序 ---------- */
+.prologue{text-align:center}
+.prologue p{font-size:clamp(18px,2.2vw,26px);line-height:2.3;letter-spacing:.12em;color:var(--paper-dim)}
+.prologue p.key{color:var(--paper);font-size:clamp(22px,3vw,36px);margin:1.4em 0}
+.prologue .gap{height:6vh}
+
+/* ---------- 手电筒 ---------- */
+.torch-intro{display:flex;justify-content:space-between;align-items:flex-end;gap:40px;flex-wrap:wrap;margin-bottom:60px}
+.torch{position:relative;--x:-999px;--y:-999px;--r:150px;cursor:none;border-top:1px solid var(--line);touch-action:pan-y}
+.torch .layer{list-style:none}
+.torch .row{height:128px;display:flex;align-items:center;justify-content:center;text-align:center;padding:0 5%;border-bottom:1px solid var(--line)}
+.torch .adult .row{font-size:clamp(19px,2.4vw,28px);letter-spacing:.1em}
+.torch .adult{
+  -webkit-mask-image:radial-gradient(circle var(--r) at var(--x) var(--y),transparent 0,transparent 45%,#000 100%);
+          mask-image:radial-gradient(circle var(--r) at var(--x) var(--y),transparent 0,transparent 45%,#000 100%)}
+.torch .child{position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(circle var(--r) at var(--x) var(--y),rgba(216,165,105,.07),transparent 100%);
+  -webkit-mask-image:radial-gradient(circle var(--r) at var(--x) var(--y),#000 0,#000 45%,transparent 100%);
+          mask-image:radial-gradient(circle var(--r) at var(--x) var(--y),#000 0,#000 45%,transparent 100%)}
+.torch .child .row{color:var(--amber);font-size:clamp(14px,1.5vw,17px);line-height:1.9;border-color:transparent}
+.torch .child .row small{display:block;font-family:var(--latin);font-style:italic;font-size:13px;letter-spacing:.2em;opacity:.6;margin-bottom:2px}
+.torch .ring{position:absolute;left:var(--x);top:var(--y);width:calc(var(--r) * 2);height:calc(var(--r) * 2);
+  margin:calc(var(--r) * -1) 0 0 calc(var(--r) * -1);border-radius:50%;border:1px solid rgba(216,165,105,.14);pointer-events:none}
+
+/* ---------- 回声图谱 ---------- */
+.atlas{display:grid;grid-template-columns:minmax(220px,1fr) 2fr;gap:6vw;margin-top:70px}
+.plist{list-style:none;border-top:1px solid var(--line)}
+.plist li button{width:100%;display:flex;align-items:baseline;gap:22px;padding:22px 0;border-bottom:1px solid var(--line);text-align:left;
+  color:var(--paper-faint);transition:color .6s var(--ease),padding .6s var(--ease)}
+.plist li button .n{font-family:var(--latin);font-size:14px;letter-spacing:.1em}
+.plist li button .t{font-size:clamp(17px,1.7vw,21px);letter-spacing:.12em}
+.plist li button:hover{color:var(--paper-dim);padding-left:8px}
+.plist li button.on{color:var(--paper);padding-left:14px}
+.plist li button.on .n{color:var(--amber)}
+.panel{position:relative;min-height:640px}
+.panel .inner{transition:opacity .6s var(--ease),transform .6s var(--ease),filter .6s var(--ease)}
+.panel.swap .inner{opacity:0;transform:translateY(14px);filter:blur(6px)}
+.viz{width:100%;height:170px;margin-bottom:30px}
+.viz svg{width:100%;height:100%;overflow:visible}
+.viz .halo{fill:none;stroke:var(--paper-faint);stroke-width:1}
+.viz .other{fill:rgba(236,230,218,.14)}
+.viz .self{fill:var(--amber);stroke:var(--amber);stroke-width:0}
+.viz .halo,.viz .other,.viz .self{transform-box:fill-box;transform-origin:center;transition:transform 1.6s var(--ease),opacity 1.6s var(--ease),fill 1s,stroke-width 1s}
+.viz .orb{transform-box:view-box;transform-origin:200px 100px}
+.viz[data-s="need"] .self{transform:translateX(20px) scale(.45)}
+.viz[data-s="need"] .other{transform:scale(1.7)}
+.viz[data-s="need"] .halo{opacity:.25;transform:translateX(60px) scale(1.2)}
+.viz[data-s="greet"] .self{transform:translateX(-80px)}
+.viz[data-s="greet"] .other{transform:translateX(90px)}
+.viz[data-s="greet"] .halo{opacity:0}
+.viz[data-s="conf"] .self{animation:tremble .18s infinite}
+.viz[data-s="conf"] .other{opacity:.35;transform:translateX(40px) scale(1.2)}
+.viz[data-s="conf"] .halo{opacity:.15;transform:scale(.6) translateX(-100px)}
+.viz[data-s="deserve"] .self{transform:translateX(-110px) scale(.8)}
+.viz[data-s="deserve"] .halo{opacity:1;transform:translateX(40px) scale(1.1)}
+.viz[data-s="deserve"] .other{opacity:.8;transform:translateX(-20px)}
+.viz[data-s="hate"] .self{fill:transparent;stroke-width:1.5;stroke-dasharray:4 5;transform:translateX(60px) scale(1.6)}
+.viz[data-s="hate"] .other{opacity:0}
+.viz[data-s="hate"] .halo{opacity:.12;transform:scale(.4)}
+.viz[data-s="fawn"] .orb{animation:orbit 9s linear infinite}
+.viz[data-s="fawn"] .other{transform:translateX(-60px) scale(1.5)}
+.viz[data-s="fawn"] .halo{opacity:.3}
+@keyframes tremble{0%{transform:translate(0,0)}25%{transform:translate(1.5px,-1px)}50%{transform:translate(-1px,1.5px)}75%{transform:translate(1px,1px)}}
+@keyframes orbit{to{transform:rotate(360deg)}}
+.p-no{font-family:var(--latin);font-size:15px;color:var(--amber);letter-spacing:.2em}
+.p-title{font-size:clamp(26px,3vw,38px);font-weight:300;letter-spacing:.14em;margin:6px 0 10px}
+.p-voice{font-size:17px;color:var(--paper-dim);margin-bottom:40px}
+.p-voice::before{content:"内在的声音 ";font-family:var(--sans);font-size:11px;letter-spacing:.25em;color:var(--paper-faint);margin-right:10px;vertical-align:2px}
+.p-grid{display:grid;grid-template-columns:1fr 1fr;gap:34px 48px}
+.p-grid h4{font-family:var(--sans);font-weight:400;font-size:12px;letter-spacing:.3em;color:var(--amber);margin-bottom:12px}
+.p-grid p,.p-grid li{font-size:15px;color:var(--paper-dim);line-height:2}
+.p-grid ul{list-style:none}
+.p-grid li{position:relative;padding-left:18px}
+.p-grid li::before{content:"";position:absolute;left:0;top:.95em;width:8px;height:1px;background:var(--paper-faint)}
+.p-grid .practice{grid-column:1/-1;padding:26px 30px;border:1px solid var(--line);background:linear-gradient(120deg,var(--amber-soft),transparent 70%)}
+.p-grid .practice p{color:var(--paper)}
+
+/* ---------- 说出需求 ---------- */
+.ask{text-align:center;min-height:100vh;display:flex;flex-direction:column;justify-content:center}
+.ask .kicker{justify-content:center}
+.ask .kicker::before{content:"";width:60px;height:1px;background:currentColor;opacity:.5}
+.stage{position:relative;max-width:760px;width:100%;margin:60px auto 0;padding:80px 0}
+.field{--s:0;position:relative}
+.field input{width:100%;background:none;border:0;border-bottom:1px solid var(--paper-faint);outline:none;
+  color:var(--paper);font-family:var(--serif);font-weight:300;font-size:clamp(20px,2.8vw,32px);letter-spacing:.1em;
+  text-align:center;padding:14px 0;caret-color:var(--amber);transition:border-color .6s,letter-spacing .6s var(--ease),font-size .6s var(--ease)}
+.field input::placeholder{color:var(--paper-faint)}
+.field input:focus{border-color:var(--amber)}
+.field.tense input{animation:tense .12s infinite}
+@keyframes tense{0%,100%{transform:translate(0,0)}33%{transform:translate(calc(var(--s) * 1.6px),calc(var(--s) * -1px))}66%{transform:translate(calc(var(--s) * -1.4px),calc(var(--s) * 1px))}}
+.whisper{position:absolute;font-family:var(--sans);font-size:13px;letter-spacing:.15em;color:var(--paper-faint);white-space:nowrap;
+  opacity:0;filter:blur(6px);transition:opacity 1.2s var(--ease),filter 1.2s var(--ease),transform 1.2s var(--ease);pointer-events:none}
+.whisper.show{opacity:1;filter:blur(.4px)}
+.chips{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:34px}
+.chips button{font-family:var(--sans);font-size:12px;letter-spacing:.12em;color:var(--paper-dim);padding:8px 16px;border:1px solid var(--line);border-radius:40px;transition:.4s}
+.chips button:hover{border-color:var(--amber);color:var(--amber)}
+.btn{display:inline-flex;align-items:center;gap:14px;margin-top:44px;padding:14px 34px;border:1px solid var(--paper-faint);border-radius:60px;
+  font-family:var(--sans);font-size:13px;letter-spacing:.35em;transition:.5s var(--ease);position:relative;overflow:hidden}
+.btn::before{content:"";position:absolute;inset:0;background:var(--amber);transform:translateY(101%);transition:transform .6s var(--ease);z-index:-1}
+.btn:hover{color:var(--ink);border-color:var(--amber)}
+.btn:hover::before{transform:none}
+.btn{isolation:isolate}
+.reply{min-height:90px;margin-top:40px;font-size:clamp(17px,1.9vw,22px);letter-spacing:.1em;color:var(--paper);transition:opacity 1s,filter 1s}
+.reply.hide{opacity:0;filter:blur(8px)}
+.reply small{display:block;margin-top:14px;font-family:var(--sans);font-size:12px;letter-spacing:.2em;color:var(--paper-faint)}
+.rise{position:fixed;z-index:70;pointer-events:none;font-size:26px;letter-spacing:.1em;color:var(--amber);white-space:nowrap;
+  text-shadow:0 0 30px rgba(216,165,105,.6);animation:rise 3.2s var(--ease) forwards}
+@keyframes rise{0%{opacity:1;filter:none}100%{opacity:0;filter:blur(10px);transform:translate(-50%,-46vh) scale(.6)}}
+
+/* ---------- 内在批评者 ---------- */
+.critic-head{display:flex;justify-content:space-between;align-items:flex-end;gap:40px;flex-wrap:wrap}
+.counter{font-family:var(--latin);font-size:46px;font-weight:300;color:var(--paper-faint);letter-spacing:.05em}
+.counter b{font-weight:300;color:var(--amber)}
+.field-voices{position:relative;height:74vh;min-height:540px;margin-top:50px;border:1px solid var(--line);overflow:hidden;
+  background:radial-gradient(ellipse at 50% 50%,rgba(0,0,0,.35),transparent 70%)}
+.voice{position:absolute;max-width:44%;transform:translate(-50%,-50%);text-align:center;cursor:pointer;
+  animation:drift var(--dur,14s) ease-in-out infinite alternate}
+.voice span{display:block;transition:opacity .9s var(--ease),filter .9s var(--ease),letter-spacing .9s var(--ease)}
+.voice .harsh{font-family:var(--sans);font-weight:700;font-size:clamp(14px,1.7vw,21px);letter-spacing:.06em;color:rgba(236,230,218,.4);filter:blur(.6px)}
+.voice:hover .harsh{color:rgba(236,230,218,.75);filter:none}
+.voice .soft{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;filter:blur(10px);
+  font-size:clamp(14px,1.55vw,19px);color:var(--amber);letter-spacing:.14em;text-shadow:0 0 24px rgba(216,165,105,.35)}
+.voice.done{cursor:default;animation-play-state:paused}
+.voice.done .harsh{opacity:0;filter:blur(14px);letter-spacing:.5em}
+.voice.done .soft{position:relative;opacity:1;filter:none}
+.voice.done .harsh{position:absolute;inset:0}
+@keyframes drift{from{transform:translate(-50%,-50%) translate(0,0)}to{transform:translate(-50%,-50%) translate(var(--dx,10px),var(--dy,-10px))}}
+.critic-end{text-align:center;margin-top:50px;min-height:120px;color:var(--paper-dim);font-size:17px;letter-spacing:.1em;opacity:0;filter:blur(8px);transition:1.6s var(--ease)}
+.critic-end.show{opacity:1;filter:none}
+
+/* ---------- 为什么 ---------- */
+.big-quote{font-size:clamp(24px,3.4vw,42px);line-height:1.7;letter-spacing:.1em;max-width:900px;margin-bottom:90px}
+.big-quote small{display:block;margin-top:20px;font-size:14px;color:var(--paper-faint);letter-spacing:.15em}
+.why{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line)}
+.why article{padding:40px 30px 44px 0;border-right:1px solid var(--line);position:relative}
+.why article:not(:first-child){padding-left:30px}
+.why article:last-child{border-right:0}
+.why article::before{content:"";position:absolute;left:0;top:-1px;height:1px;width:0;background:var(--amber);transition:width 1.2s var(--ease)}
+.why article:not(:first-child)::before{left:0}
+.why article:hover::before{width:100%}
+.why .en{font-family:var(--latin);font-style:italic;font-size:15px;color:var(--amber);letter-spacing:.1em}
+.why h3{font-weight:400;font-size:20px;letter-spacing:.14em;margin:8px 0 18px}
+.why p{font-size:14px;color:var(--paper-dim);line-height:2.1}
+.ff{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.ff span{font-family:var(--sans);font-size:11px;letter-spacing:.2em;padding:4px 10px;border:1px solid var(--line);color:var(--paper-dim)}
+.ff span:last-child{border-color:var(--amber);color:var(--amber)}
+
+/* ---------- 呼吸 ---------- */
+.breathe{text-align:center;min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center}
+.breathe .kicker{justify-content:center}
+.breathe .kicker::before{content:"";width:60px;height:1px;background:currentColor;opacity:.5}
+.orb-wrap{position:relative;width:min(60vw,340px);aspect-ratio:1;margin:60px auto 30px;display:grid;place-items:center}
+.orb-wrap .rings{position:absolute;inset:0;border-radius:50%;border:1px solid var(--line)}
+.orb-wrap .rings::after{content:"";position:absolute;inset:22%;border-radius:50%;border:1px dashed var(--line)}
+.bubble{position:absolute;inset:0;border-radius:50%;transform:scale(.42);
+  background:radial-gradient(circle at 40% 35%,rgba(236,210,170,.5),rgba(216,165,105,.18) 45%,rgba(216,165,105,.02) 70%);
+  box-shadow:0 0 80px rgba(216,165,105,.18);transition:transform 4s cubic-bezier(.45,0,.55,1)}
+.breath-label{position:relative;font-size:20px;letter-spacing:.5em;padding-left:.5em;transition:opacity .8s}
+.breath-sub{font-family:var(--sans);font-size:12px;letter-spacing:.3em;color:var(--paper-faint);height:20px}
+
+/* ---------- 写信 ---------- */
+.letter .wrap{max-width:760px}
+.paper{position:relative;margin-top:50px;padding:46px 50px;border:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(236,230,218,.035),rgba(236,230,218,.01));transition:transform 1.4s var(--ease),opacity 1.4s var(--ease),filter 1.4s var(--ease)}
+.paper::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(transparent 0 43px,rgba(236,230,218,.05) 43px 44px);background-position:0 46px}
+.paper .to{font-size:17px;letter-spacing:.14em;color:var(--paper-dim);margin-bottom:10px}
+.paper textarea{width:100%;min-height:264px;resize:vertical;background:none;border:0;outline:none;color:var(--paper);
+  font-family:var(--serif);font-weight:300;font-size:17px;line-height:44px;letter-spacing:.08em;caret-color:var(--amber)}
+.paper textarea::placeholder{color:var(--paper-faint)}
+.paper.fold{transform:perspective(900px) rotateX(70deg) scale(.2) translateY(-120px);opacity:0;filter:blur(8px)}
+.paper.nudge{animation:nudge .5s}
+@keyframes nudge{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.letter-actions{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
+.paper.fold + .letter-actions{opacity:0;pointer-events:none}
+.letter-done{text-align:center;font-size:18px;letter-spacing:.12em;color:var(--paper-dim);opacity:0;filter:blur(8px);transition:1.6s var(--ease);margin-top:-200px;pointer-events:none;min-height:200px}
+.letter-done.show{opacity:1;filter:none;pointer-events:auto}
+.letter-done button{margin-top:26px;font-family:var(--sans);font-size:12px;letter-spacing:.3em;color:var(--paper-faint);border-bottom:1px solid var(--line);padding-bottom:4px}
+.spark{position:fixed;z-index:70;width:8px;height:8px;border-radius:50%;background:var(--amber);pointer-events:none;
+  box-shadow:0 0 20px 6px rgba(216,165,105,.5);animation:spark 4s var(--ease) forwards}
+@keyframes spark{0%{opacity:0;transform:scale(.2)}15%{opacity:1;transform:scale(1.4)}100%{opacity:0;transform:translate(var(--sx,0),-80vh) scale(.4)}}
+
+/* ---------- 尾声 ---------- */
+.coda{text-align:center;padding-top:14vh}
+.coda .final{font-size:clamp(24px,3.6vw,46px);letter-spacing:.14em;line-height:1.8}
+.coda .final em{text-shadow:0 0 40px rgba(216,165,105,.4)}
+footer{position:relative;z-index:3;padding:10vh 8vw 60px;border-top:1px solid var(--line);margin-top:16vh}
+footer .cols{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:1.2fr 1fr;gap:6vw}
+footer h4{font-family:var(--sans);font-weight:400;font-size:12px;letter-spacing:.3em;color:var(--amber);margin-bottom:18px}
+footer p,footer li{font-size:14px;color:var(--paper-dim);line-height:2.1}
+footer ul{list-style:none}
+footer li b{font-family:var(--latin);font-weight:400;font-size:20px;color:var(--paper);letter-spacing:.06em;margin-left:10px}
+footer .fine{max-width:1080px;margin:70px auto 0;font-family:var(--sans);font-size:11px;letter-spacing:.2em;color:var(--paper-faint);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+
+/* ---------- 响应式 ---------- */
+@media (max-width:900px){
+  .dots{display:none}
+  .atlas{grid-template-columns:1fr;gap:40px}
+  .plist{display:flex;overflow-x:auto;border:0;gap:8px;scrollbar-width:none}
+  .plist li button{white-space:nowrap;border:1px solid var(--line);border-radius:40px;padding:8px 16px}
+  .plist li button:hover,.plist li button.on{padding-left:16px}
+  .plist li button.on{border-color:var(--amber)}
+  .p-grid{grid-template-columns:1fr}
+  .why{grid-template-columns:1fr 1fr}
+  .why article{padding:30px 20px 34px 0!important;border-right:0;border-bottom:1px solid var(--line)}
+  .torch .row{height:150px}
+  .voice{max-width:70%}
+  .paper{padding:30px 22px}
+  footer .cols{grid-template-columns:1fr}
+  .top .note{display:none}
+}
+@media (hover:none){.torch{cursor:auto}.glow{display:none}}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  .char{opacity:1;filter:none;transform:none}
+}
+</style>
+</head>
+<body>
+
+<canvas id="sky"></canvas>
+<div class="glow" id="glow"></div>
+<div class="vignette"></div>
+<div class="grain"></div>
+<div class="progress" id="progress"></div>
+
+<header class="top">
+  <div class="brand"><b>回声</b>Echoes</div>
+  <div class="note">请照顾好自己 · 随时可以离开</div>
+</header>
+
+<nav class="dots" id="dots"></nav>
+
+<!-- 0 · 开场 -->
+<section class="hero" id="s-hero" data-label="开场">
+  <div class="wrap" style="width:100%">
+    <p class="eyebrow">the child who learned to be quiet</p>
+    <h1>
+      <span class="l" data-split>有些沉默，</span>
+      <span class="l" data-split>是很小的时候学会的。</span>
+    </h1>
+    <p class="sub">关于童年创伤，以及它如何悄悄住进我们成年后的每一次交流——不敢开口、不敢靠近、不敢相信自己值得。</p>
+    <p class="cw">本页涉及童年创伤话题。如果感到不适，请停下来，深呼吸，或者关掉它。</p>
+  </div>
+  <div class="scroll"><span class="hint">向下</span><i></i></div>
+</section>
+
+<!-- I · 序 -->
+<section class="prologue" id="s-pro" data-label="序">
+  <div class="wrap">
+    <p class="rv">你可能已经不记得发生过什么。</p>
+    <p class="rv" style="--d:.3s">但你的身体记得。</p>
+    <div class="gap"></div>
+    <p class="rv">它记得哪一句话之后，空气会突然变冷；</p>
+    <p class="rv" style="--d:.3s">记得哪一种表情，意味着必须安静。</p>
+    <p class="rv key">于是你学会了——少要一点，少说一点，<em>少存在一点</em>。</p>
+    <p class="rv">那时候，这是一个孩子能想到的，最聪明的生存方式。</p>
+    <div class="gap"></div>
+    <p class="rv" style="--d:.2s">只是后来，你长大了。</p>
+    <p class="rv" style="--d:.6s">而它，没有被告知。</p>
+  </div>
+</section>
+
+<!-- II · 手电筒 -->
+<section id="s-torch" data-label="照见">
+  <div class="wrap">
+    <div class="torch-intro">
+      <div>
+        <div class="kicker rv">II — Beneath</div>
+        <h2 class="rv">每一句成年人的话底下，<br>都站着一个孩子。</h2>
+      </div>
+      <p class="hint rv">移动光标 / 手指轻触 · 照见那个时刻</p>
+    </div>
+    <div class="torch rv" id="torch">
+      <ul class="layer adult" id="torchAdult"></ul>
+      <ul class="layer child" id="torchChild" aria-hidden="true"></ul>
+      <div class="ring"></div>
+    </div>
+  </div>
+</section>
+
+<!-- III · 回声图谱 -->
+<section id="s-atlas" data-label="回声">
+  <div class="wrap">
+    <div class="kicker rv">III — Echoes</div>
+    <h2 class="rv">六种回声</h2>
+    <p class="lead rv">它们不是性格缺陷，而是曾经奏效的保护。看见它从哪里来，是松开它的第一步。</p>
+    <div class="atlas rv">
+      <ul class="plist" id="plist"></ul>
+      <div class="panel" id="panel">
+        <div class="inner" id="pinner">
+          <div class="viz" id="viz" data-s="need">
+            <svg viewBox="0 0 400 200" aria-hidden="true">
+              <circle class="halo" cx="200" cy="100" r="72"/>
+              <circle class="other" cx="260" cy="100" r="26"/>
+              <g class="orb"><circle class="self" cx="140" cy="100" r="16"/></g>
+            </svg>
+          </div>
+          <div id="pbody"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- IV · 说出需求 -->
+<section class="ask" id="s-ask" data-label="开口">
+  <div class="wrap">
+    <div class="kicker rv">IV — Ask</div>
+    <h2 class="rv">试着，说出一个小小的需求。</h2>
+    <p class="hint rv">打字时，你也许会听见一些熟悉的声音</p>
+    <div class="stage rv" id="stage">
+      <div class="field" id="field">
+        <input id="need" type="text" maxlength="40" autocomplete="off" placeholder="我想……">
+      </div>
+      <div class="chips" id="chips"></div>
+      <button class="btn" id="sayBtn">说出来 <span>→</span></button>
+      <div class="reply hide" id="reply"></div>
+    </div>
+  </div>
+</section>
+
+<!-- V · 内在批评者 -->
+<section id="s-critic" data-label="改写">
+  <div class="wrap">
+    <div class="critic-head">
+      <div>
+        <div class="kicker rv">V — Rewrite</div>
+        <h2 class="rv">那些声音，<br>最初并不是你的。</h2>
+        <p class="lead rv">它们是你曾经听过的话，被一遍遍重复，直到听起来像自己。点击它们，换一种说法。</p>
+      </div>
+      <div class="counter rv"><b id="cnt">0</b> / <span id="tot">8</span></div>
+    </div>
+    <div class="field-voices rv" id="voices"></div>
+    <p class="critic-end" id="criticEnd">你刚刚做的事，就是疗愈本身的样子：<br>不是让旧的声音消失，而是让新的声音，也有位置。</p>
+  </div>
+</section>
+
+<!-- VI · 为什么 -->
+<section id="s-why" data-label="为什么">
+  <div class="wrap">
+    <div class="kicker rv">VI — Why</div>
+    <p class="big-quote rv">创伤，不只是“发生了不好的事”。<br>也可以是——<em>那些本该发生的好事，从来没有发生。</em>
+      <small>被看见、被回应、被安慰、被允许犯错。长期的情感忽视，同样会在一个人身上留下痕迹。</small></p>
+    <div class="why">
+      <article class="rv">
+        <div class="en">Attachment</div>
+        <h3>依恋</h3>
+        <p>孩子通过照顾者的回应，学习“关系是什么样子”。回应稳定，就学会信任；回应冷漠或忽冷忽热，就学会警惕、讨好或疏离——并把这套模板带进成年后的所有关系。</p>
+      </article>
+      <article class="rv" style="--d:.15s">
+        <div class="en">Core Beliefs</div>
+        <h3>核心信念</h3>
+        <p>孩子无法理解“是大人出了问题”，只能得出“是我不够好”。这些结论沉入心底，变成不需证明的“事实”：我是负担、我不重要、我不配。</p>
+      </article>
+      <article class="rv" style="--d:.3s">
+        <div class="en">Nervous System</div>
+        <h3>神经系统</h3>
+        <p>长期处于不安全中，身体会校准到“随时戒备”。一个平常的招呼、一次微小的请求，都可能触发与当年同样强度的警报。</p>
+        <div class="ff"><span>战</span><span>逃</span><span>僵</span><span>讨好</span></div>
+      </article>
+      <article class="rv" style="--d:.45s">
+        <div class="en">Neuroplasticity</div>
+        <h3>可以改变</h3>
+        <p>大脑终身都在重塑。安全的关系、专业的咨询、一次次小小的新体验，都在写入新的经验：原来开口不会被惩罚，原来我可以被好好对待。</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- VII · 呼吸 -->
+<section class="breathe" id="s-breathe" data-label="此刻">
+  <div class="kicker rv">VII — Here &amp; Now</div>
+  <h2 class="rv">先回到此刻。</h2>
+  <p class="lead rv" style="margin:0 auto">你已经不是那个无处可逃的孩子了。<br>这里是现在，你是安全的。</p>
+  <div class="orb-wrap rv">
+    <div class="rings"></div>
+    <div class="bubble" id="bubble"></div>
+    <div class="breath-label" id="blabel">准备</div>
+  </div>
+  <p class="breath-sub" id="bsub"></p>
+  <button class="btn rv" id="bbtn">开始呼吸</button>
+</section>
+
+<!-- VIII · 写信 -->
+<section class="letter" id="s-letter" data-label="写信">
+  <div class="wrap">
+    <div class="kicker rv">VIII — A Letter</div>
+    <h2 class="rv">写给那个孩子。</h2>
+    <p class="lead rv">告诉他/她那时没有人说出口的话。这封信不会被保存，不会被上传——它只属于你们两个。</p>
+    <div class="paper rv" id="paper">
+      <p class="to">亲爱的，小时候的我：</p>
+      <textarea id="letterText" placeholder="那不是你的错。你已经很努力了……"></textarea>
+    </div>
+    <div class="letter-actions rv">
+      <span class="hint">写完，把它交给光</span>
+      <button class="btn" id="sendLetter" style="margin-top:30px">寄出 <span>✦</span></button>
+    </div>
+    <div class="letter-done" id="letterDone">
+      它被收到了。<br>那个孩子等这句话，等了很久。
+      <br><button id="againBtn">再写一封</button>
+    </div>
+  </div>
+</section>
+
+<!-- 尾声 -->
+<section class="coda" id="s-coda" data-label="尾声">
+  <div class="wrap">
+    <p class="final rv">你不是太敏感，<br>你只是太早学会了<em>保护自己</em>。</p>
+    <p class="lead rv" style="margin:40px auto 0;--d:.4s">现在，你可以慢慢学习另一件事：<br>被保护，也被允许存在。</p>
+  </div>
+</section>
+
+<footer>
+  <div class="cols">
+    <div>
+      <h4>如果这些让你感到很沉重</h4>
+      <p>本页面仅用于心理科普与自我觉察，不构成任何诊断或治疗建议。如果你在这些描述里看见了自己，寻求专业心理咨询师的陪伴，是一件勇敢且值得的事。疗愈通常不是一个人完成的。</p>
+    </div>
+    <div>
+      <h4>你可以求助</h4>
+      <ul>
+        <li>全国心理援助热线<b>12356</b></li>
+        <li>希望 24 热线<b>400-161-9995</b></li>
+        <li>紧急情况请拨打<b>110 / 120</b></li>
+      </ul>
+    </div>
+  </div>
+  <div class="fine"><span>回声 · ECHOES</span><span>本页不收集任何数据</span></div>
+</footer>
+
+<script>
+(() => {
+const $ = s => document.querySelector(s);
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ========== 逐字出现 ========== */
+let ci = 0;
+document.querySelectorAll('[data-split]').forEach(el => {
+  const t = el.textContent; el.textContent = '';
+  [...t].forEach(ch => {
+    const s = document.createElement('span');
+    s.className = 'char'; s.textContent = ch; s.style.setProperty('--i', ci++);
+    el.appendChild(s);
+  });
+});
+
+/* ========== 星尘背景 ========== */
+const cv = $('#sky'), cx = cv.getContext('2d');
+let W, H, DPR, motes = [];
+const mouse = { x: -9999, y: -9999, tx: -9999, ty: -9999 };
+function resize() {
+  DPR = Math.min(devicePixelRatio || 1, 2);
+  W = innerWidth; H = innerHeight;
+  cv.width = W * DPR; cv.height = H * DPR;
+  cv.style.width = W + 'px'; cv.style.height = H + 'px';
+  cx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  const n = Math.min(110, Math.floor(W * H / 14000));
+  motes = Array.from({ length: n }, () => mk(true));
+}
+function mk(any) {
+  return {
+    x: Math.random() * W, y: any ? Math.random() * H : H + 10,
+    r: Math.random() * 1.5 + .3, vx: (Math.random() - .5) * .08,
+    vy: -(Math.random() * .22 + .04), p: Math.random() * 6.28, z: Math.random()
+  };
+}
+let lastY = scrollY;
+function tick(t) {
+  cx.clearRect(0, 0, W, H);
+  const dy = scrollY - lastY; lastY = scrollY;
+  for (const m of motes) {
+    m.x += m.vx; m.y += m.vy - dy * m.z * .15;
+    const ddx = m.x - mouse.x, ddy = m.y - mouse.y, d2 = ddx * ddx + ddy * ddy;
+    let boost = 0;
+    if (d2 < 22000) { const d = Math.sqrt(d2) || 1; m.x += ddx / d * .6; m.y += ddy / d * .6; boost = 1 - d2 / 22000; }
+    if (m.y < -10 || m.y > H + 40) Object.assign(m, mk(false), m.y < -10 ? {} : { y: -5 });
+    if (m.x < -10) m.x = W + 10; if (m.x > W + 10) m.x = -10;
+    const a = (.25 + .35 * Math.sin(t * .001 + m.p) ** 2) * (.4 + m.z * .6) + boost * .5;
+    cx.beginPath();
+    cx.fillStyle = `rgba(236,${200 + m.z * 20 | 0},${150 + m.z * 40 | 0},${a})`;
+    cx.arc(m.x, m.y, m.r * (1 + boost), 0, 6.283);
+    cx.fill();
+  }
+  // 柔光跟随
+  mouse.x += (mouse.tx - mouse.x) * .08; mouse.y += (mouse.ty - mouse.y) * .08;
+  glow.style.transform = `translate(${mouse.x}px,${mouse.y}px)`;
+  requestAnimationFrame(tick);
+}
+const glow = $('#glow');
+addEventListener('pointermove', e => { mouse.tx = e.clientX; mouse.ty = e.clientY; if (mouse.x < -9000) { mouse.x = mouse.tx; mouse.y = mouse.ty; } });
+addEventListener('resize', resize);
+resize(); requestAnimationFrame(tick);
+
+/* ========== 滚动显现 / 进度 / 导航点 ========== */
+const io = new IntersectionObserver(es => es.forEach(e => {
+  if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+}), { threshold: .15, rootMargin: '0px 0px -8% 0px' });
+document.querySelectorAll('.rv').forEach(el => io.observe(el));
+
+const secs = [...document.querySelectorAll('section[data-label]')];
+const dots = $('#dots');
+secs.forEach(s => {
+  const a = document.createElement('a'); a.href = '#' + s.id;
+  a.innerHTML = `<span>${s.dataset.label}</span>`; dots.appendChild(a);
+});
+const dotEls = [...dots.children];
+const prog = $('#progress');
+function onScroll() {
+  const max = document.documentElement.scrollHeight - innerHeight;
+  prog.style.transform = `scaleX(${scrollY / max})`;
+  let cur = 0;
+  secs.forEach((s, i) => { if (s.getBoundingClientRect().top < innerHeight * .5) cur = i; });
+  dotEls.forEach((d, i) => d.classList.toggle('on', i === cur));
+}
+addEventListener('scroll', onScroll, { passive: true }); onScroll();
+
+/* ========== II 手电筒 ========== */
+const torchData = [
+  ['没关系，你们决定就好。', '六岁', '“你哪来那么多意见？”——从那以后，你学会了把想法咽回去。'],
+  ['（远远看到熟人，低头假装看手机）', '八岁', '每一次主动靠近，换来的都是不耐烦。靠近，就等于准备被拒绝。'],
+  ['不好意思，打扰了，真的很抱歉……', '七岁', '家里的天气取决于大人的脸色。你的工作，是让一切不要出错。'],
+  ['这么好的东西，给我太浪费了。', '十岁', '“你看看人家。”——爱，好像要先考到第一名，才能领取。'],
+  ['都怪我，我总是把事情搞砸。', '五岁', '没有人告诉你，大人的愤怒不是你造成的。所以你以为，是。'],
+  ['我很好，不用担心我。', '四岁', '哭的时候，没有人来。后来，你就不哭了。'],
+];
+$('#torchAdult').innerHTML = torchData.map(r => `<li class="row">${r[0]}</li>`).join('');
+$('#torchChild').innerHTML = torchData.map(r => `<li class="row"><span><small>${r[1]}</small>${r[2]}</span></li>`).join('');
+const torch = $('#torch');
+let tr = { x: -999, y: -999, tx: -999, ty: -999, on: false };
+function torchMove(e) {
+  const b = torch.getBoundingClientRect();
+  tr.tx = e.clientX - b.left; tr.ty = e.clientY - b.top;
+  if (!tr.on) { tr.x = tr.tx; tr.y = tr.ty; tr.on = true; loopTorch(); }
+}
+function loopTorch() {
+  tr.x += (tr.tx - tr.x) * .14; tr.y += (tr.ty - tr.y) * .14;
+  torch.style.setProperty('--x', tr.x + 'px'); torch.style.setProperty('--y', tr.y + 'px');
+  if (tr.on) requestAnimationFrame(loopTorch);
+}
+torch.addEventListener('pointermove', torchMove);
+torch.addEventListener('pointerdown', torchMove);
+torch.addEventListener('pointerleave', e => {
+  if (e.pointerType === 'mouse') { tr.on = false; torch.style.setProperty('--x', '-999px'); torch.style.setProperty('--y', '-999px'); }
+});
+
+/* ========== III 回声图谱 ========== */
+const patterns = [
+  { s: 'need', t: '害怕提出需求', v: '“我的需要，是别人的负担。”',
+    now: ['口渴了，也不好意思开口要一杯水', '需要帮忙时反复斟酌措辞，最后还是没发出去', '被问“你想吃什么”，脑子里一片空白'],
+    from: '需求常常被忽视、被嘲笑，或换来一句“你怎么这么多事”。又或者，家里总有更需要被照顾的人——生病的家长、情绪不稳的大人——你的需要只能永远排在后面。',
+    guard: '不提需求，就不会被拒绝；不抱期待，就不会失望。这让一个无力的孩子，至少保住了一点尊严。',
+    try: '每天提出一个极小的需求——“可以帮我递一下吗？”然后留意：世界并没有因此崩塌。' },
+  { s: 'greet', t: '害怕打招呼', v: '“我的出现，会打扰到别人。”',
+    now: ['远远看到认识的人，下意识绕路', '打招呼前在心里预演好几遍', '对方没有回应，懊恼一整天'],
+    from: '主动靠近时曾遭遇冷漠、打断或当众评判；或者照顾者的回应忽冷忽热——同样是扑过去，有时被拥抱，有时被推开。靠近，变成了一件无法预测的事。',
+    guard: '不主动，就不必暴露在不可预测的回应里。躲开，是对风险最简单的控制。',
+    try: '把打招呼理解为“发出一个信号”，而不是“请求一个回应”。你只负责说出口，对方的反应，属于对方。' },
+  { s: 'conf', t: '不自信', v: '“我的判断，不值得被相信。”',
+    now: ['发言前心跳加速，说完反复复盘', '被夸奖时第一反应是否认', '明明能做好，却总觉得自己在“装”'],
+    from: '长期被批评、被比较、被否定。做对了是应该的，做错了被无限放大。很少有人看见你努力本身，只看见结果够不够好。',
+    guard: '先贬低自己，别人的批评就伤不了那么深。自我怀疑，是一副提前穿上的盔甲。',
+    try: '睡前写下一件今天做成的小事，只写事实，不加“但是”。' },
+  { s: 'deserve', t: '不配得感', v: '“我必须先做点什么，才被允许拥有。”',
+    now: ['收到礼物会不安，急着回报', '好事发生时，总在等“另一只鞋落地”', '关系越好，越想逃开'],
+    from: '爱是有条件的——要乖、要优秀、要懂事。被给予时常伴随着“你欠我的”；或者，好的东西，总是先给了别人。',
+    guard: '不接受，就不会亏欠；不拥有，就不会失去。站在光外面，至少不会被赶出去。',
+    try: '下次被感谢或被夸奖时，只说“谢谢”，然后停住。感受那几秒钟的不适——它会过去的。' },
+  { s: 'hate', t: '自我厌恶', v: '“我本身，就是那个问题。”',
+    now: ['犯一个小错，就在心里骂自己很久', '讨厌镜子里、录音里的自己', '隐约觉得：“我这个人，就是错的”'],
+    from: '孩子无法承受“我依赖的大人有问题”这个念头——那太可怕了。于是只能得出另一个结论：“是我不好”。把错揽到自己身上，才能保住那段赖以生存的关系。',
+    guard: '如果错在我，我就还有一点控制感：只要我变好，一切就会好起来。',
+    try: '当你在心里骂自己时，问一句：我会这样对一个七岁的孩子说话吗？' },
+  { s: 'fawn', t: '讨好', v: '“只要他们开心，我就是安全的。”',
+    now: ['很难说“不”', '总是第一个察觉别人的情绪', '自己的愤怒还没来得及感受，就被压了下去'],
+    from: '在不安全的环境里，讨好（fawn）是神经系统的一种生存反应：安抚那个危险的人，比对抗或逃跑更可能让自己平安。',
+    guard: '你用超乎年龄的敏锐，换来了家里片刻的平静。那是一个孩子能做到的全部。',
+    try: '在说“好”之前，先停三秒，问问自己：我真的想吗？' },
+];
+const plist = $('#plist'), panel = $('#panel'), viz = $('#viz'), pbody = $('#pbody');
+plist.innerHTML = patterns.map((p, i) =>
+  `<li><button data-i="${i}"><span class="n">0${i + 1}</span><span class="t">${p.t}</span></button></li>`).join('');
+const pbtns = [...plist.querySelectorAll('button')];
+let pcur = -1;
+function renderP(i) {
+  const p = patterns[i];
+  pbody.innerHTML = `
+    <div class="p-no">0${i + 1} / 0${patterns.length}</div>
+    <h3 class="p-title">${p.t}</h3>
+    <p class="p-voice">${p.v}</p>
+    <div class="p-grid">
+      <div><h4>现在的你</h4><ul>${p.now.map(x => `<li>${x}</li>`).join('')}</ul></div>
+      <div><h4>它可能从哪里来</h4><p>${p.from}</p></div>
+      <div style="grid-column:1/-1"><h4>它曾经保护过你</h4><p>${p.guard}</p></div>
+      <div class="practice"><h4>一个很小的练习</h4><p>${p.try}</p></div>
+    </div>`;
+}
+function selectP(i) {
+  if (i === pcur) return;
+  pbtns.forEach((b, j) => b.classList.toggle('on', j === i));
+  viz.dataset.s = patterns[i].s;
+  if (pcur < 0) { renderP(i); pcur = i; return; }
+  pcur = i;
+  panel.classList.add('swap');
+  setTimeout(() => { renderP(i); panel.classList.remove('swap'); }, 450);
+}
+pbtns.forEach(b => b.addEventListener('click', () => selectP(+b.dataset.i)));
+selectP(0);
+
+/* ========== IV 说出需求 ========== */
+const need = $('#need'), field = $('#field'), stage = $('#stage'), reply = $('#reply');
+const whispers = [
+  { t: '会不会太麻烦别人？', at: 1, x: '4%', y: '8%' },
+  { t: '对方会不会觉得我很烦……', at: 5, x: '62%', y: '14%' },
+  { t: '要不，还是算了吧', at: 10, x: '10%', y: '72%' },
+  { t: '这点小事，忍一忍就过去了', at: 15, x: '58%', y: '66%' },
+  { t: '你凭什么要求这些', at: 21, x: '34%', y: '0%' },
+];
+const wEls = whispers.map(w => {
+  const s = document.createElement('span');
+  s.className = 'whisper'; s.textContent = w.t; s.style.left = w.x; s.style.top = w.y;
+  stage.appendChild(s); return s;
+});
+function updateFear() {
+  const n = need.value.trim().length;
+  const s = Math.min(n / 14, 1.6);
+  field.style.setProperty('--s', s);
+  field.classList.toggle('tense', n > 0 && !reduce);
+  whispers.forEach((w, i) => {
+    const on = n >= w.at;
+    wEls[i].classList.toggle('show', on);
+    wEls[i].style.transform = on ? `translate(${Math.sin(i * 2) * 8}px,${Math.cos(i) * 6}px)` : '';
+  });
+}
+need.addEventListener('input', updateFear);
+const chipList = ['能帮我倒杯水吗？', '我今天有点累，想早点休息。', '这件事，我不太同意。', '可以陪我待一会儿吗？', '我需要一点时间想想。'];
+$('#chips').innerHTML = chipList.map(c => `<button>${c}</button>`).join('');
+$('#chips').addEventListener('click', e => {
+  if (e.target.tagName !== 'BUTTON') return;
+  need.value = ''; need.focus();
+  const txt = e.target.textContent; let k = 0;
+  const iv = setInterval(() => { need.value = txt.slice(0, ++k); updateFear(); if (k >= txt.length) clearInterval(iv); }, 70);
+});
+const replies = [
+  '说出来了。你看，世界还在。',
+  '你的需求不是麻烦。它只是在告诉别人：你是一个真实的人。',
+  '对方可以拒绝，但你依然有权提出。<br>被拒绝的是请求，不是你。',
+  '很好。下一次，也许会容易一点点。',
+  '需要，是活着的证明，不是软弱的证据。',
+];
+let said = 0;
+function say() {
+  const v = need.value.trim();
+  if (!v) { need.focus(); need.placeholder = '哪怕只是一个字也可以'; return; }
+  const b = need.getBoundingClientRect();
+  const r = document.createElement('div');
+  r.className = 'rise'; r.textContent = v;
+  r.style.left = (b.left + b.width / 2) + 'px'; r.style.top = b.top + 'px';
+  r.style.transform = 'translateX(-50%)';
+  document.body.appendChild(r); setTimeout(() => r.remove(), 3300);
+  need.value = ''; updateFear();
+  said++;
+  reply.classList.add('hide');
+  setTimeout(() => {
+    reply.innerHTML = replies[(said - 1) % replies.length] + `<small>你已经说出了 ${said} 个需求</small>`;
+    reply.classList.remove('hide');
+  }, 900);
+}
+$('#sayBtn').addEventListener('click', say);
+need.addEventListener('keydown', e => { if (e.key === 'Enter') say(); });
+
+/* ========== V 内在批评者 ========== */
+const voices = [
+  ['你怎么这么没用', '我正在学。学东西，本来就需要时间。'],
+  ['别给别人添麻烦', '需要帮助，是人的一部分，不是缺陷。'],
+  ['你不配', '值得被爱，不需要资格。'],
+  ['他们肯定都讨厌你', '我没办法读心。我可以去确认。'],
+  ['闭嘴，别出丑', '我的声音可以笨拙，也可以存在。'],
+  ['都是你的错', '那时我只是个孩子，不该承担大人的责任。'],
+  ['你的感受太多了', '我的感受有分量，不必把它缩小。'],
+  ['再努力一点，才会有人爱你', '我不需要完美，也值得被好好对待。'],
+];
+const pos = [[27, 13], [70, 20], [44, 34], [73, 46], [26, 55], [60, 66], [30, 84], [70, 87]];
+const vbox = $('#voices'); let done = 0;
+$('#tot').textContent = voices.length;
+voices.forEach(([h, s], i) => {
+  const el = document.createElement('div');
+  el.className = 'voice';
+  el.style.left = pos[i][0] + '%'; el.style.top = pos[i][1] + '%';
+  el.style.setProperty('--dur', (10 + Math.random() * 8) + 's');
+  el.style.setProperty('--dx', (Math.random() * 40 - 20) + 'px');
+  el.style.setProperty('--dy', (Math.random() * 30 - 15) + 'px');
+  el.style.animationDelay = (-Math.random() * 10) + 's';
+  el.innerHTML = `<span class="harsh">${h}</span><span class="soft">${s}</span>`;
+  el.addEventListener('click', () => {
+    if (el.classList.contains('done')) return;
+    el.classList.add('done'); done++;
+    $('#cnt').textContent = done;
+    burst(el);
+    if (done === voices.length) setTimeout(() => $('#criticEnd').classList.add('show'), 800);
+  });
+  vbox.appendChild(el);
+});
+function burst(el) {
+  const b = el.getBoundingClientRect();
+  for (let k = 0; k < 6; k++) {
+    const s = document.createElement('div');
+    s.className = 'spark';
+    s.style.left = (b.left + b.width * Math.random()) + 'px';
+    s.style.top = (b.top + b.height / 2) + 'px';
+    s.style.width = s.style.height = (2 + Math.random() * 3) + 'px';
+    s.style.setProperty('--sx', (Math.random() * 120 - 60) + 'px');
+    s.style.animationDuration = (2 + Math.random() * 2) + 's';
+    document.body.appendChild(s); setTimeout(() => s.remove(), 4200);
+  }
+}
+
+/* ========== VII 呼吸 ========== */
+const bubble = $('#bubble'), blabel = $('#blabel'), bsub = $('#bsub'), bbtn = $('#bbtn');
+const phases = [
+  { t: '吸气', d: 4000, s: 1, sub: '让空气慢慢填满胸口' },
+  { t: '停留', d: 2000, s: 1, sub: '你在这里' },
+  { t: '呼气', d: 6000, s: .42, sub: '把肩膀放下来' },
+];
+let bOn = false, bTimer, cycles = 0;
+function runPhase(i) {
+  if (!bOn) return;
+  const p = phases[i];
+  bubble.style.transitionDuration = p.d + 'ms';
+  bubble.style.transform = `scale(${p.s})`;
+  blabel.style.opacity = 0;
+  setTimeout(() => { blabel.textContent = p.t; blabel.style.opacity = 1; }, 300);
+  bsub.textContent = p.sub;
+  if (i === 2) cycles++;
+  bTimer = setTimeout(() => {
+    if (i === 2 && cycles >= 6) { stopBreath('谢谢你，陪自己待了一分钟。'); return; }
+    runPhase((i + 1) % 3);
+  }, p.d);
+}
+function stopBreath(msg) {
+  bOn = false; clearTimeout(bTimer);
+  bubble.style.transitionDuration = '2000ms'; bubble.style.transform = 'scale(.42)';
+  blabel.textContent = '准备'; bsub.textContent = msg || '';
+  bbtn.firstChild.textContent = '开始呼吸';
+}
+bbtn.addEventListener('click', () => {
+  if (bOn) return stopBreath();
+  bOn = true; cycles = 0; bbtn.firstChild.textContent = '停下';
+  runPhase(0);
+});
+
+/* ========== VIII 写信 ========== */
+const paper = $('#paper'), ta = $('#letterText'), ldone = $('#letterDone');
+$('#sendLetter').addEventListener('click', () => {
+  if (!ta.value.trim()) {
+    paper.classList.remove('nudge'); void paper.offsetWidth; paper.classList.add('nudge');
+    ta.focus(); return;
+  }
+  const b = paper.getBoundingClientRect();
+  paper.classList.add('fold');
+  setTimeout(() => {
+    const s = document.createElement('div');
+    s.className = 'spark';
+    s.style.left = (b.left + b.width / 2) + 'px'; s.style.top = (b.top + b.height / 3) + 'px';
+    document.body.appendChild(s); setTimeout(() => s.remove(), 4200);
+    ldone.classList.add('show');
+    ta.value = '';
+  }, 1000);
+});
+$('#againBtn').addEventListener('click', () => {
+  ldone.classList.remove('show'); paper.classList.remove('fold'); setTimeout(() => ta.focus(), 800);
+});
+})();
+</script>
+</body>
+</html>
